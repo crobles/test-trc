@@ -11,7 +11,7 @@ export class CascadeController {
   async nodeCascadeProcessingData() {
     const functionName = 'nodeCascadeProcessingData';
 
-    console.log(`in ${functionName} processing data...`);
+    console.info(`in function ${functionName} ---> processing data...`);
 
     const response = await this.nodeCascadeProcessingDataUseCase.run();
 
