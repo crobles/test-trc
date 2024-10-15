@@ -1,40 +1,43 @@
-# 1.- Build/compile code
-FROM node:22-alpine3.20 as builder
+# Etapa 1: Construcción
+FROM node:18-alpine AS builder
+
+# Establecemos el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
+# Copiamos los archivos package.json y package-lock.json para instalar dependencias
 COPY package*.json ./
+
+# Instalamos las dependencias
+RUN npm install --legacy-peer-deps
+
+COPY tsconfig.json ./
+
+# Copiamos el resto del código fuente al directorio de trabajo
 COPY . .
 
-RUN npm install -g npm@10.8.1
-RUN apk update && apk upgrade --no-cache libcrypto3 libssl3
-RUN apk update && apk upgrade && apk add --no-cache busybox=1.36.1-r29
-
-# Install dependencies
-RUN npm install
-RUN npm install @nestjs/cli@10.0.0
-
-# Compile files in the dist folder
+# Construimos el proyecto (esto compilará el código TypeScript a JavaScript)
 RUN npm run build
 
-#####################################
-# 2.- Create image with compiled code
-FROM node:22-alpine3.20
+# Etapa 2: Imagen final para producción
+FROM node:18-alpine AS runner
 
-# Change the work directory app
+# Establecemos el directorio de trabajo
 WORKDIR /app
 
-COPY --from=builder ./app/dist ./dist
-COPY package* ./
+# Copiamos solo los archivos necesarios de la etapa anterior (build)
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
 
-RUN npm install -g npm@10.8.1
-RUN apk update && apk upgrade --no-cache libcrypto3 libssl3
-RUN apk update && apk upgrade && apk add --no-cache busybox=1.36.1-r29
+COPY --from=builder /app/tsconfig.json ./
 
-# Install dependencies (without devDependencies)
-RUN npm install --omit=dev
+# Instalamos solo las dependencias de producción
+RUN npm install 
 
-# Expose the port 3000
-EXPOSE 3000
+# Copy the .env file
+COPY .env /app/.env
 
-# Run the server
-CMD ["npm","run","start"]
+# Definimos el puerto en el que la aplicación se ejecutará
+EXPOSE 3100
+
+# Comando para iniciar la aplicación
+CMD ["npm", "run", "start:dev2"]
