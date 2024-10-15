@@ -6,6 +6,7 @@ import { configmapSettings } from './shared/settings/configmap.settings';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   await app.listen(configmapSettings.APP_PORT);
 }
 bootstrap()

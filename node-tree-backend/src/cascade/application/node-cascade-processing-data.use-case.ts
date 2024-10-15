@@ -4,16 +4,9 @@ import { nodeTree } from '../../shared/json-files/nodeTree';
 
 @Injectable()
 export class NodeCascadeProcessingDataUseCase implements UseCase {
-  private config: any;
-  constructor() {
-    this.loadConfig();
-  }
-  private loadConfig() {
-    console.log(typeof nodeTree);
-    this.config = nodeTree;
-  }
   async run(): Promise<any> {
-    const dataNode = this.transformDataNode(this.config);
+    const data = JSON.parse(JSON.stringify(nodeTree));
+    const dataNode = this.transformDataNode(data);
     const dataTree = this.transformDataTree(dataNode);
     return JSON.stringify(dataTree, null, 2);
   }
@@ -25,8 +18,9 @@ export class NodeCascadeProcessingDataUseCase implements UseCase {
     }, {});
 
     return data.map((item) => {
-      if (item.nodeList) {
-        item.nodeList = item.nodeList.map((id) => {
+      const newItem = { ...item }; // Copia superficial del item
+      if (newItem.nodeList) {
+        newItem.nodeList = newItem.nodeList.map((id) => {
           const nodeObject = idMap[id];
           return {
             id: nodeObject.id,
@@ -35,7 +29,7 @@ export class NodeCascadeProcessingDataUseCase implements UseCase {
           };
         });
       }
-      return item;
+      return newItem; // Devuelve el nuevo objeto en lugar de mutar el original
     });
   }
 
