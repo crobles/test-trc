@@ -24,7 +24,7 @@ const getEdgesNodes = (
 ) => {
   const { id, node: label, value, children } = node;
 
-  nodes.push({ id, label: `ID: ${id}\n${label}\nValue: ${value}`, value });
+  nodes.push({ id, label: `ID: ${id}\n${label}\nValor: ${value}`, value });
 
   if (parentId !== undefined) {
     edges.push({ from: parentId, to: id });
@@ -103,7 +103,7 @@ const Graph: React.FC<GraphProps> = ({ data }) => {
       network.on("hoverNode", function (params) {
         const nodeId = params.node;
         const sum = calculateSumTot(nodeId, nodes, edges);
-        const nodeLabel = `Sum to root: ${sum}`;
+        const nodeLabel = `Sum tot: ${sum}`;
 
         const updatedNode = {
           ...nodes.find((n) => n.id === nodeId),
@@ -119,7 +119,7 @@ const Graph: React.FC<GraphProps> = ({ data }) => {
         if (originalNode) {
           const updatedNode = {
             id: originalNode.id,
-            label: `ID: ${originalNode.id}\n${originalNode.node}\nValue: ${originalNode.value}`,
+            label: `ID: ${originalNode.id}\n${originalNode.node}\nValor: ${originalNode.value}`,
           };
           dataSet.nodes.update(updatedNode);
         }

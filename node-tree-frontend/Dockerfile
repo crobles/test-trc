@@ -1,37 +1,40 @@
-# Etapa 1: Construcción de la aplicación
+# 1. Etapa de construcción
 FROM node:18-alpine AS builder
 
-# Establecer el directorio de trabajo
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar los archivos package.json y package-lock.json o yarn.lock
+# Copia solo los archivos de dependencias para aprovechar el cache de Docker
 COPY package*.json ./
 
-# Instalar las dependencias necesarias para la construcción
-RUN npm install
+# Instala dependencias
+RUN npm install 
 
-# Copiar el resto de la aplicación
+# Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Construir la aplicación Next.js
+# Realiza el build de la aplicación Next.js
 RUN npm run build
 
-# Etapa 2: Ejecutar la aplicación en producción
+# 2. Etapa de producción
 FROM node:18-alpine AS runner
 
-# Establecer el directorio de trabajo
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar los archivos estáticos generados en la etapa de construcción
+# Copia las dependencias necesarias para producción desde la etapa de construcción
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copia los archivos de compilación de la aplicación
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
 
-# Instalar solo las dependencias de producción
-RUN npm install --only=production
+# Define la variable de entorno para producción
+ENV NODE_ENV=development
 
-# Exponer el puerto en el que se ejecutará la aplicación
+# Expone el puerto de la aplicación (Next.js usa el puerto 3000 por defecto)
 EXPOSE 3000
 
-# Comando para ejecutar la aplicación Next.js
-CMD ["npm", "run", "dev"]
+# Comando por defecto para correr la aplicación
+CMD ["npm", "start"]
