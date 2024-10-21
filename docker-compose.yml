@@ -3,6 +3,7 @@ version: "3.9"
 services:
   # Servicio para la API NestJS
   api:
+    image: node-tree-backend
     build:
       context: ./node-tree-backend
       dockerfile: Dockerfile
@@ -16,7 +17,7 @@ services:
 
   # Servicio para la aplicación Next.js
   web:
-    image: node:18-alpine
+    image: node-tree-frontend
     build:
       context: ./node-tree-frontend
       dockerfile: Dockerfile
@@ -25,7 +26,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      # Asegurarse de que Next.js conozca la URL de la API
       - API_URL=http://api:3100
     depends_on:
       - api

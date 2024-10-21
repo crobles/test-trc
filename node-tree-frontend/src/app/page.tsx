@@ -1,13 +1,12 @@
 import React from "react";
 import Graph from "./Graph";
 
+const API_URL = process.env.API_URL;
+
 const MainPage = async () => {
-  const res = await fetch(
-    "http://localhost:3100/node-tree-backend/v1/node/cascade",
-    {
-      cache: "no-store",
-    }
-  );
+  const res = await fetch(`${API_URL}/node-tree-backend/v1/node/cascade`, {
+    cache: "no-store",
+  });
 
   const data = await res.json();
 
@@ -31,18 +30,18 @@ import { CSSProperties } from "react";
 const styles: { [key: string]: CSSProperties } = {
   container: {
     display: "flex",
-    flexDirection: "row", // Dos divs horizontales
-    height: "100vh", // Altura completa de la ventana
+    flexDirection: "row",
+    height: "100vh",
   },
   sidebar: {
-    width: "20%", // 20% del ancho
-    backgroundColor: "black", // Un color de fondo claro
+    width: "20%",
+    backgroundColor: "black",
     padding: "20px",
     boxSizing: "border-box",
-    overflowY: "auto", // Para permitir el desplazamiento si el contenido es largo
+    overflowY: "auto",
   },
   mainContent: {
-    width: "80%", // 80% del ancho
+    width: "80%",
     padding: "20px",
     boxSizing: "border-box",
   },
